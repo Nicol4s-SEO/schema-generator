@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schema Generator Pro v2 · JSON-LD + IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  SCHEMA GENERATOR PRO v2                                     ║
+  ║  Herramienta de generación de datos estructurados + IA       ║
+  ║                                                              ║
+  ║  DESPLIEGUE:                                                 ║
+  ║  · GitHub Pages → sube como index.html en tu repo           ║
+  ║    Activa Pages en Settings → Pages → main / root           ║
+  ║    URL: https://usuario.github.io/repositorio               ║
+  ║                                                              ║
+  ║  · Netlify Drop → drag & drop en netlify.com/drop           ║
+  ║  · Vercel      → vercel.com → New Project → upload HTML     ║
+  ║                                                              ║
+  ║  API KEY:                                                    ║
+  ║  · Obtén tu clave en platform.openai.com/api-keys           ║
+  ║  · Se guarda en localStorage (nunca se envía a terceros)    ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C8102E;--red-l:#f5e6e9;--red-d:#8b0a1f;
+  --ink:#1a1a1a;--ink2:#444;--ink3:#777;
+  --surf:#fafaf8;--white:#fff;--bord:#e2e0d8;--bord2:#ccc9be;
+  --grn:#1a7a4a;--grn-l:#e6f5ee;
+  --blue:#1a4a8b;--blue-l:#e6eef5;
+  --amber:#7a5500;--amber-l:#fff8e6;
+  --violet:#4a1a8b;--violet-l:#f0ecff;
+  --ai:#6b21a8;--ai-l:#f5f3ff;--ai-d:#4c1d95;--ai-b:#d8b4fe;
+  --teal:#0d7a7a;--teal-l:#e6f7f7;
+  --orange:#c45c00;--orange-l:#fff3e6;
+  --pink:#a8216b;--pink-l:#fce7f3;
+  --gold:#b07b00;--gold-l:#fef9e7;
+  --mono:'DM Mono',monospace;--sans:'Sora',sans-serif;
+}
+body{font-family:var(--sans);background:var(--surf);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+header{background:var(--red);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.header-left{display:flex;align-items:center;gap:12px}
+header h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+header p{font-size:11px;opacity:.75;margin-top:2px;font-weight:300}
+.hdr-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.btn-settings{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 12px;font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-settings:hover{background:rgba(255,255,255,.25)}
+
+/* MODE TABS */
+.mode-bar{display:flex;background:#fff;border-bottom:2px solid var(--bord);overflow-x:auto;gap:0;flex-shrink:0}
+.mode-tab{padding:10px 18px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;background:none;font-family:var(--sans);color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px}
+.mode-tab:hover{color:var(--ink);background:#fafaf8}
+.mode-tab.active{color:var(--red);border-bottom-color:var(--red);background:#fff}
+.mode-badge{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700}
+.badge-info{background:var(--blue-l);color:var(--blue)}
+.badge-shop{background:var(--grn-l);color:var(--grn)}
+.badge-article{background:var(--amber-l);color:var(--amber)}
+.badge-recipe{background:var(--violet-l);color:var(--violet)}
+.badge-org{background:var(--teal-l);color:var(--teal)}
+.badge-bc{background:var(--orange-l);color:var(--orange)}
+.badge-faq{background:var(--pink-l);color:var(--pink)}
+.badge-review{background:var(--gold-l);color:var(--gold)}
+
+/* AI ADVISOR BAR */
+.ai-bar{background:linear-gradient(135deg,#f5f3ff 0%,#ede9fe 100%);border-bottom:1.5px solid var(--ai-b);padding:10px 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ai-bar-label{font-size:11px;font-weight:700;color:var(--ai);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.ai-bar-label svg{flex-shrink:0}
+.ai-url-input{flex:1;min-width:200px;font-family:var(--sans);font-size:12px;border:1.5px solid var(--ai-b);border-radius:7px;padding:6px 10px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
+.ai-url-input:focus{border-color:var(--ai);box-shadow:0 0 0 3px rgba(107,33,168,.08)}
+.btn-ai{background:var(--ai);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-family:var(--sans);font-size:11.5px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-ai:hover{background:var(--ai-d)}
+.btn-ai:disabled{opacity:.5;cursor:not-allowed}
+.ai-results{width:100%;margin-top:4px;display:flex;flex-wrap:wrap;gap:7px}
+.ai-rec-card{background:#fff;border:1.5px solid var(--ai-b);border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s;animation:slideIn .2s ease}
+.ai-rec-card:hover{border-color:var(--ai);background:var(--ai-l);transform:translateY(-1px)}
+@keyframes slideIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.ai-rec-pri{font-size:8px;font-weight:800;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.5px}
+.pri-alta{background:#fde8ee;color:#c8102e}
+.pri-media{background:var(--amber-l);color:var(--amber)}
+.pri-baja{background:#f0f0f0;color:#666}
+.ai-rec-name{font-size:11.5px;font-weight:700;color:var(--ink)}
+.ai-rec-reason{font-size:10px;color:var(--ink3);margin-top:1px}
+.ai-rec-go{font-size:10px;color:var(--ai);font-weight:700;margin-left:auto;white-space:nowrap}
+.ai-loading{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ai)}
+.spinner{width:14px;height:14px;border:2px solid var(--ai-b);border-top-color:var(--ai);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-error{font-size:11px;color:#c8102e;padding:6px 10px;background:#fdf2f4;border:1px solid #f5c0c8;border-radius:6px}
+.ai-bar-toggle{font-size:10px;color:var(--ai);background:none;border:none;cursor:pointer;font-family:var(--sans);font-weight:600;text-decoration:underline;padding:0;white-space:nowrap}
+
+/* SITE CONFIG */
+.config-bar{background:#f5f3ee;border-bottom:1px solid #e2e0d8;padding:9px 28px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.cfg-field{display:flex;flex-direction:column;gap:3px}
+.cfg-label{font-size:9.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px}
+.cfg-input{font-family:var(--sans);font-size:12.5px;border:1.5px solid #ccc9be;border-radius:7px;padding:5px 10px;background:#fff;color:#1a1a1a;outline:none;transition:border-color .15s}
+.cfg-input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.07)}
+.btn-ai-fill{background:var(--ai);color:#fff;border:none;border-radius:7px;padding:5px 11px;font-family:var(--sans);font-size:10.5px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;align-self:flex-end;white-space:nowrap;height:32px}
+.btn-ai-fill:hover{background:var(--ai-d)}
+.btn-ai-fill:disabled{opacity:.5;cursor:not-allowed}
+
+/* LAYOUT */
+.main{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0}
+.panel{padding:22px 26px;overflow-y:auto;height:100%}
+.panel-left{border-right:1px solid var(--bord);background:#fff}
+.panel-right{background:#1c1c1e}
+
+/* FORM */
+.section-label{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.9px;margin:16px 0 8px;display:flex;align-items:center;gap:7px}
+.section-label:first-of-type{margin-top:0}
+.section-label::after{content:'';flex:1;height:1px;background:var(--red-l)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.field{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+label{font-size:11px;font-weight:600;color:var(--ink2);display:flex;align-items:center;gap:5px}
+.req{color:var(--red)}
+.opt{font-size:9px;font-weight:400;color:var(--ink3);background:#f0ede6;padding:1px 5px;border-radius:3px}
+.rec{font-size:9px;font-weight:700;color:var(--grn);background:var(--grn-l);padding:1px 5px;border-radius:3px}
+input[type=text],textarea,select{font-family:var(--sans);font-size:12.5px;border:1.5px solid var(--bord2);border-radius:7px;padding:7px 10px;background:var(--surf);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.08);background:#fff}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+.hint{font-size:10px;color:var(--ink3);margin-top:2px;line-height:1.4}
+.divider{height:1px;background:var(--bord);margin:14px 0}
+
+/* SELLOS */
+.sellos-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.sello-item{display:flex;align-items:center;gap:5px;background:#f5f3ee;border:1.5px solid var(--bord);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:11.5px;font-weight:500;color:var(--ink2);user-select:none;transition:all .12s}
+.sello-item:hover,.sello-item.active{border-color:var(--red);background:var(--red-l);color:var(--red-d)}
+.sello-item input{display:none}
+.sdot{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--bord2);background:#fff;transition:all .12s;flex-shrink:0}
+.sello-item.active .sdot{background:var(--red);border-color:var(--red)}
+
+/* INFO BOX */
+.info-box{background:var(--blue-l);border:1px solid #b0c8e8;border-radius:8px;padding:10px 13px;font-size:11.5px;color:var(--blue);line-height:1.6;margin-bottom:12px}
+.info-box strong{font-weight:700}
+.warn-box{background:var(--amber-l);border:1px solid #f0d080;border-radius:8px;padding:10px 13px;font-size:11.5px;color:var(--amber);line-height:1.6;margin-bottom:12px}
+.ai-box{background:var(--ai-l);border:1px solid var(--ai-b);border-radius:8px;padding:10px 13px;font-size:11.5px;color:var(--ai);line-height:1.6;margin-bottom:12px}
+
+/* BUTTONS */
+.btn-gen{width:100%;margin-top:16px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:11px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-gen:hover{background:var(--red-d)}
+.btn-gen:active{transform:scale(.98)}
+.btn-add{background:#f5f3ee;color:var(--ink2);border:1.5px solid var(--bord);border-radius:7px;padding:6px 12px;font-family:var(--sans);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;margin-top:6px}
+.btn-add:hover{border-color:var(--red);background:var(--red-l);color:var(--red-d)}
+.btn-remove{background:none;color:#e05050;border:none;font-size:14px;cursor:pointer;padding:2px 5px;border-radius:4px;transition:background .12s;flex-shrink:0;line-height:1}
+.btn-remove:hover{background:#fde8ee}
+
+/* FAQ & BREADCRUMB DYNAMIC BUILDERS */
+.item-list{display:flex;flex-direction:column;gap:9px;margin-top:8px}
+.item-block{background:#fafaf8;border:1.5px solid var(--bord);border-radius:9px;padding:11px 13px;position:relative}
+.item-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.item-num{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px}
+
+/* SOCIAL LINKS */
+.social-grid{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.social-row{display:flex;align-items:center;gap:7px}
+.social-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff}
+.si-x{background:#000}
+.si-fb{background:#1877f2}
+.si-ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+.si-li{background:#0077b5}
+.si-yt{background:#ff0000}
+.si-wp{background:#21759b}
+
+/* OUTPUT */
+.out-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.out-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555}
+.out-actions{display:flex;gap:7px;align-items:center}
+.copy-btn{background:#333;color:#bbb;border:1px solid #444;border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s}
+.copy-btn:hover{background:#444;color:#fff}
+.copy-btn.copied{background:var(--grn);color:#fff;border-color:var(--grn)}
+.validate-btn{background:#1a3a1a;color:#7ec87e;border:1px solid #2a5a2a;border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center}
+.validate-btn:hover{background:#2a4a2a}
+.code-out{background:#141416;border-radius:8px;padding:16px;font-family:var(--mono);font-size:11px;line-height:1.75;color:#cdd6f4;white-space:pre;overflow-x:auto;border:1px solid #2a2a2e;min-height:160px}
+.placeholder{color:#444;font-family:var(--sans);font-size:13px;text-align:center;padding:48px 20px;line-height:1.7}
+
+/* CHECKLIST */
+.checklist{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+.ci{display:flex;align-items:center;gap:7px;font-size:11px;font-family:var(--mono);color:#555}
+.ci .dot{width:7px;height:7px;border-radius:50%;background:#333;flex-shrink:0}
+.ci.ok{color:#6ecf72}.ci.ok .dot{background:#4caf50}
+.ci.fail{color:#f07070}.ci.fail .dot{background:#e05050}
+.ci.warn{color:#f0c050}.ci.warn .dot{background:#c09000}
+.success-note{margin-top:12px;padding:9px 12px;background:#1a2e1a;border:1px solid #2a4a2a;border-radius:7px;font-size:11px;color:#7ec87e;font-family:var(--mono)}
+
+/* PILLS */
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pill{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;background:#2a2a2e;color:#555;border:1px solid #333}
+.pill.on{background:#1a2e1a;color:#7ec87e;border-color:#2a4a2a}
+
+/* TABS PANEL */
+.form-panel{display:none}
+.form-panel.active{display:block}
+
+/* SYNTAX */
+.sk{color:#89b4fa}.ss{color:#a6e3a1}.su{color:#fab387}.sn{color:#f9e2af}.st{color:#cba6f7}.sb{color:#6c7086}
+
+/* API KEY MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:#fff;border-radius:14px;padding:28px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.modal-subtitle{font-size:12px;color:var(--ink3);margin-bottom:18px;line-height:1.5}
+.modal-input{width:100%;font-family:var(--mono);font-size:12px;border:1.5px solid var(--bord2);border-radius:8px;padding:9px 12px;background:#fafaf8;color:var(--ink);outline:none;margin-bottom:12px}
+.modal-input:focus{border-color:var(--ai);box-shadow:0 0 0 3px rgba(107,33,168,.08)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-modal-save{background:var(--ai);color:#fff;border:none;border-radius:7px;padding:8px 18px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-modal-save:hover{background:var(--ai-d)}
+.btn-modal-cancel{background:#f0ede6;color:var(--ink2);border:1.5px solid var(--bord);border-radius:7px;padding:8px 14px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-modal-cancel:hover{border-color:var(--bord2)}
+.modal-info{font-size:10.5px;color:var(--ink3);line-height:1.6;background:#f9f8f5;border-radius:7px;padding:9px 12px;margin-bottom:14px}
+.modal-info a{color:var(--ai);text-decoration:none;font-weight:600}
+.modal-info a:hover{text-decoration:underline}
+.modal-divider{height:1px;background:var(--bord);margin:14px 0}
+.key-indicator{display:flex;align-items:center;gap:6px;font-size:10.5px;font-family:var(--mono)}
+.key-dot{width:8px;height:8px;border-radius:50%}
+.key-set{background:#4caf50}.key-unset{background:#e05050}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#333;color:#fff;border-radius:8px;padding:10px 16px;font-size:12px;font-family:var(--sans);font-weight:600;z-index:2000;animation:toastIn .2s ease;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:860px){
+  body{height:auto;overflow:auto}
+  .main{grid-template-columns:1fr;flex:none}
+  .panel{height:auto;overflow-y:visible}
+  .panel-left{border-right:none;border-bottom:1px solid var(--bord)}
+  .config-bar{padding:9px 16px}
+  .ai-bar{padding:9px 16px}
+  header{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ API KEY MODAL ═══ -->
+<div class="modal-overlay" id="api-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#6b21a8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Configurar API de IA
+    </div>
+    <div class="modal-subtitle">Agrega tu clave de OpenAI para habilitar el autocompletado inteligente y el asesor de schemas.</div>
+    <div class="modal-info">
+      🔑 Obtén tu clave en <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a><br>
+      🔒 Tu clave se guarda <strong>solo en este navegador</strong> (localStorage). No se envía a ningún servidor externo.<br>
+      ⚡ Se usa el modelo <strong>GPT-4o mini</strong> para máxima velocidad y eficiencia de costos.
+    </div>
+    <input type="password" class="modal-input" id="modal-api-input" placeholder="sk-..." autocomplete="off">
+    <div id="modal-key-status" style="margin-bottom:10px"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeApiModal()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveApiKey()">💾 Guardar clave</button>
+    </div>
+    <div class="modal-divider"></div>
+    <div style="font-size:10px;color:var(--ink3);line-height:1.5">
+      Sin API key, la herramienta funciona completa en modo manual. La IA solo acelera el llenado de campos. Para eliminar la clave, haz clic en ⚙ → Borrar clave.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="header-left">
+    <div>
+      <h1>Schema Generator Pro <span class="hdr-badge">v2 · IA</span></h1>
+      <p>Datos estructurados · Google Search Central · JSON-LD · 8 schemas · OpenAI</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div id="hdr-key-indicator" style="display:flex;align-items:center;gap:5px;font-size:10px;opacity:.7;color:#fff"></div>
+    <button class="btn-settings" onclick="showApiModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      API · IA
+    </button>
+  </div>
+</header>
+
+<!-- ═══ MODE TABS ═══ -->
+<div class="mode-bar">
+  <button class="mode-tab active" onclick="setMode('pdp')" id="tab-pdp"><span class="mode-badge badge-info">PDP</span>Prod. Informativo</button>
+  <button class="mode-tab" onclick="setMode('ecom')" id="tab-ecom"><span class="mode-badge badge-shop">E-COM</span>Ecommerce</button>
+  <button class="mode-tab" onclick="setMode('article')" id="tab-article"><span class="mode-badge badge-article">ART</span>Artículo / Blog</button>
+  <button class="mode-tab" onclick="setMode('recipe')" id="tab-recipe"><span class="mode-badge badge-recipe">REC</span>Receta</button>
+  <button class="mode-tab" onclick="setMode('org')" id="tab-org"><span class="mode-badge badge-org">ORG</span>Organization</button>
+  <button class="mode-tab" onclick="setMode('breadcrumb')" id="tab-breadcrumb"><span class="mode-badge badge-bc">BC</span>Breadcrumb</button>
+  <button class="mode-tab" onclick="setMode('faq')" id="tab-faq"><span class="mode-badge badge-faq">FAQ</span>Preg. Frecuentes</button>
+  <button class="mode-tab" onclick="setMode('review')" id="tab-review"><span class="mode-badge badge-review">REV</span>Review Snippet</button>
+</div>
+
+<!-- ═══ AI ADVISOR BAR ═══ -->
+<div class="ai-bar">
+  <div class="ai-bar-label">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><circle cx="19" cy="5" r="3" fill="#6b21a8" stroke="none"/></svg>
+    Asesor IA de Schemas
+  </div>
+  <input class="ai-url-input" type="text" id="ai-advisor-url" placeholder="Pega la URL de tu página para que la IA recomiende los schemas más apropiados...">
+  <button class="btn-ai" onclick="runAdvisor()" id="btn-advisor">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Analizar
+  </button>
+  <div id="ai-results-area" style="width:100%;margin-top:0"></div>
+</div>
+
+<!-- ═══ SITE CONFIG BAR ═══ -->
+<div class="config-bar">
+  <div class="cfg-field" style="flex:1;min-width:170px">
+    <span class="cfg-label">Nombre del sitio / marca <span style="color:#C8102E">*</span></span>
+    <input type="text" class="cfg-input" id="g_nombre" placeholder="Mi Marca" oninput="syncSite()" style="min-width:0">
+  </div>
+  <div class="cfg-field" style="flex:2;min-width:200px">
+    <span class="cfg-label">URL base del sitio <span style="color:#C8102E">*</span></span>
+    <input type="text" class="cfg-input" id="g_url" placeholder="https://tudominio.com" oninput="syncSite()" style="min-width:0">
+  </div>
+  <div class="cfg-field" style="flex:2;min-width:180px">
+    <span class="cfg-label">URL del logo</span>
+    <input type="text" class="cfg-input" id="g_logo" placeholder="https://tudominio.com/logo.png" style="min-width:0">
+  </div>
+  <button class="btn-ai-fill" onclick="autoFillSite()" id="btn-autofill" title="La IA extrae el nombre y URL base de cualquier URL que pegues en el campo URL base">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Autocompletar IA
+  </button>
+  <div style="font-size:9.5px;color:#888;white-space:nowrap;padding-bottom:6px">Aplica a todos los schemas</div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+<div class="panel panel-left" id="left-panel">
+
+<!-- ════════════════ PDP INFORMATIVO ════════════════ -->
+<div class="form-panel active" id="form-pdp">
+  <div class="info-box"><strong>PDP Informativa (Thing + ItemPage)</strong> — Página de producto sin precio ni carrito. Usa <code>Thing</code> como entidad principal. Válida para Google sin error de "offers requerido".</div>
+  <div class="section-label">URL y navegación</div>
+  <div class="field"><label>URL de la página <span class="req">*</span></label><input type="text" id="p_url" placeholder="https://tudominio.com/productos/nombre-producto"></div>
+  <div class="section-label">Datos del producto</div>
+  <div class="field-row">
+    <div class="field"><label>SKU <span class="req">*</span></label><input type="text" id="p_sku" placeholder="70228"></div>
+    <div class="field"><label>EAN / GTIN-13 <span class="req">*</span></label><input type="text" id="p_ean" placeholder="7702014702286"></div>
+  </div>
+  <div class="field"><label>Nombre del producto <span class="req">*</span></label><input type="text" id="p_nombre" placeholder="Nombre del producto"></div>
+  <div class="field"><label>Descripción <span class="req">*</span></label><textarea id="p_desc" placeholder="Descripción completa del producto..."></textarea></div>
+  <div class="field"><label>URL imagen principal <span class="req">*</span></label><input type="text" id="p_img" placeholder="https://tudominio.com/imagen.jpg"></div>
+  <div class="field-row">
+    <div class="field"><label>Tamaño / Peso <span class="req">*</span></label><input type="text" id="p_tam" placeholder="180 g"></div>
+    <div class="field"><label>Presentación <span class="req">*</span></label><input type="text" id="p_pre" placeholder="Pack x 6"></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><label>Categoría <span class="req">*</span></label><input type="text" id="p_cat" placeholder="Enlatados"></div>
+    <div class="field"><label>Vida útil <span class="opt">opcional</span></label><input type="text" id="p_vida" placeholder="24 Meses"></div>
+  </div>
+  <div class="field"><label>Marca <span class="opt">opcional</span></label><input type="text" id="p_marca" placeholder="Se usará el nombre del sitio si se deja vacío"><span class="hint">Deja vacío para usar el nombre del sitio configurado arriba</span></div>
+  <div class="field"><label>Características <span class="opt">opcional</span></label><input type="text" id="p_caract" placeholder="Tamaño grande uniforme y consistencia firme"></div>
+  <div class="divider"></div>
+  <div class="section-label">Sellos nutricionales</div>
+  <div class="sellos-grid" id="p-sellos">
+    <label class="sello-item"><input type="checkbox" value="Exceso de Azúcares"><span class="sdot"></span>Azúcares</label>
+    <label class="sello-item"><input type="checkbox" value="Exceso de Sodio"><span class="sdot"></span>Sodio</label>
+    <label class="sello-item"><input type="checkbox" value="Exceso de Grasas Saturadas"><span class="sdot"></span>Grasas Sat.</label>
+    <label class="sello-item"><input type="checkbox" value="Exceso de Grasas Trans"><span class="sdot"></span>Grasas Trans</label>
+    <label class="sello-item"><input type="checkbox" value="Exceso de Calorías"><span class="sdot"></span>Calorías</label>
+  </div>
+  <button class="btn-gen" onclick="genPDP()">⟨/⟩ Generar Schema PDP Informativa</button>
+</div>
+
+<!-- ════════════════ ECOMMERCE ════════════════ -->
+<div class="form-panel" id="form-ecom">
+  <div class="info-box"><strong>Ecommerce (Product + Offer)</strong> — Según Google, para <em>Product Snippet</em> necesitas <code>name</code> + uno de: <code>offers</code>, <code>review</code> o <code>aggregateRating</code>. Para <em>Merchant Listing</em> también se requiere imagen y disponibilidad.</div>
+  <div class="section-label">Subtipo de schema</div>
+  <div class="field">
+    <label>Tipo de producto ecommerce <span class="req">*</span></label>
+    <select id="e_subtipo" onchange="toggleEcomSubtype()">
+      <option value="snippet">Product Snippet (sin compra directa, con reseñas)</option>
+      <option value="merchant">Merchant Listing (compra directa, con precio)</option>
+    </select>
+    <span class="hint">Product Snippet → páginas de reseña/comparador · Merchant Listing → tienda online</span>
+  </div>
+  <div class="section-label">URL y datos base</div>
+  <div class="field"><label>URL de la página <span class="req">*</span></label><input type="text" id="e_url" placeholder="https://tudominio.com/productos/..."></div>
+  <div class="field-row">
+    <div class="field"><label>SKU <span class="req">*</span></label><input type="text" id="e_sku" placeholder="70228"></div>
+    <div class="field"><label>EAN / GTIN-13 <span class="req">*</span></label><input type="text" id="e_ean" placeholder="7702014702286"></div>
+  </div>
+  <div class="field"><label>Nombre <span class="req">*</span></label><input type="text" id="e_nombre" placeholder="Nombre del producto"></div>
+  <div class="field"><label>Descripción <span class="req">*</span></label><textarea id="e_desc"></textarea></div>
+  <div class="field"><label>URL imagen <span class="req">*</span></label><input type="text" id="e_img" placeholder="https://tudominio.com/imagen.jpg"></div>
+  <div class="field-row">
+    <div class="field"><label>Categoría <span class="req">*</span></label><input type="text" id="e_cat" placeholder="Enlatados"></div>
+    <div class="field"><label>Marca <span class="req">*</span></label><input type="text" id="e_marca" placeholder="Se usa nombre del sitio si está vacío"></div>
+  </div>
+  <div id="merchant-fields">
+    <div class="section-label">Precio y disponibilidad <span class="rec">Merchant Listing</span></div>
+    <div class="field-row">
+      <div class="field"><label>Precio <span class="req">*</span></label><input type="text" id="e_precio" placeholder="12900"></div>
+      <div class="field"><label>Moneda <span class="req">*</span></label><select id="e_moneda"><option value="COP">COP</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="MXN">MXN</option><option value="PEN">PEN</option><option value="CLP">CLP</option><option value="ARS">ARS</option></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Disponibilidad <span class="req">*</span></label>
+        <select id="e_disp">
+          <option value="https://schema.org/InStock">En stock</option>
+          <option value="https://schema.org/OutOfStock">Agotado</option>
+          <option value="https://schema.org/PreOrder">Pre-orden</option>
+          <option value="https://schema.org/LimitedAvailability">Disponibilidad limitada</option>
+        </select>
+      </div>
+      <div class="field"><label>Precio válido hasta <span class="opt">opcional</span></label><input type="text" id="e_pvigencia" placeholder="2025-12-31"></div>
+    </div>
+    <div class="field">
+      <label>Condición <span class="req">*</span></label>
+      <select id="e_cond">
+        <option value="https://schema.org/NewCondition">Nuevo</option>
+        <option value="https://schema.org/UsedCondition">Usado</option>
+        <option value="https://schema.org/RefurbishedCondition">Reacondicionado</option>
+      </select>
+    </div>
+  </div>
+  <div class="section-label">Valoraciones <span class="rec">recomendado</span></div>
+  <div class="warn-box">Agrega valoraciones <strong>solo si realmente están visibles en la página</strong>. Google las verifica contra el contenido visible.</div>
+  <div class="field-row">
+    <div class="field"><label>Puntuación media <span class="opt">opcional</span></label><input type="text" id="e_rating" placeholder="4.5"></div>
+    <div class="field"><label>Número de reseñas <span class="opt">opcional</span></label><input type="text" id="e_reviews" placeholder="48"></div>
+  </div>
+  <button class="btn-gen" onclick="genEcom()">⟨/⟩ Generar Schema Ecommerce</button>
+</div>
+
+<!-- ════════════════ ARTICLE ════════════════ -->
+<div class="form-panel" id="form-article">
+  <div class="info-box"><strong>Article / NewsArticle / BlogPosting</strong> — Según Google Search Central, <code>headline</code>, <code>image</code>, <code>author</code> y <code>datePublished</code> son las más recomendadas para rich results.</div>
+  <div class="section-label">Tipo de artículo</div>
+  <div class="field">
+    <select id="a_tipo">
+      <option value="Article">Article (general)</option>
+      <option value="NewsArticle">NewsArticle (noticias)</option>
+      <option value="BlogPosting">BlogPosting (blog)</option>
+    </select>
+  </div>
+  <div class="section-label">Datos del artículo</div>
+  <div class="field"><label>URL <span class="req">*</span></label><input type="text" id="a_url" placeholder="https://tudominio.com/blog/titulo-articulo"></div>
+  <div class="field"><label>Titular (headline) <span class="req">*</span></label><input type="text" id="a_headline" placeholder="Título del artículo (máx. 110 caracteres)"><span class="hint">Google recomienda máximo 110 caracteres</span></div>
+  <div class="field"><label>Descripción <span class="opt">opcional</span></label><textarea id="a_desc" placeholder="Resumen del artículo..."></textarea></div>
+  <div class="field"><label>URL imagen principal <span class="rec">recomendado</span></label><input type="text" id="a_img" placeholder="https://tudominio.com/imagen.jpg"><span class="hint">Mínimo 1200px de ancho · Proporción 16:9, 4:3 o 1:1</span></div>
+  <div class="section-label">Autor y fechas</div>
+  <div class="field-row">
+    <div class="field"><label>Nombre del autor <span class="rec">recomendado</span></label><input type="text" id="a_autor" placeholder="Nombre del autor o equipo"></div>
+    <div class="field">
+      <label>Tipo de autor</label>
+      <select id="a_autor_tipo">
+        <option value="Person">Persona</option>
+        <option value="Organization">Organización</option>
+      </select>
+    </div>
+  </div>
+  <div class="field"><label>URL perfil del autor <span class="opt">opcional</span></label><input type="text" id="a_autor_url" placeholder="https://tudominio.com/equipo/nombre-autor"></div>
+  <div class="field-row">
+    <div class="field"><label>Fecha publicación <span class="rec">recomendado</span></label><input type="text" id="a_pub" placeholder="2025-04-15T09:00:00-05:00"><span class="hint">Formato ISO 8601</span></div>
+    <div class="field"><label>Fecha modificación <span class="opt">opcional</span></label><input type="text" id="a_mod" placeholder="2025-04-15T09:00:00-05:00"></div>
+  </div>
+  <button class="btn-gen" onclick="genArticle()">⟨/⟩ Generar Schema Artículo</button>
+</div>
+
+<!-- ════════════════ RECIPE ════════════════ -->
+<div class="form-panel" id="form-recipe">
+  <div class="info-box"><strong>Recipe</strong> — Propiedades recomendadas por Google: <code>name</code>, <code>image</code>, <code>author</code>, <code>datePublished</code>, <code>description</code>, <code>prepTime</code>, <code>cookTime</code>, <code>recipeYield</code>, <code>recipeIngredient</code>, <code>recipeInstructions</code>, <code>nutrition</code> y <code>aggregateRating</code>.</div>
+  <div class="section-label">Datos base de la receta</div>
+  <div class="field"><label>URL <span class="req">*</span></label><input type="text" id="r_url" placeholder="https://tudominio.com/recetas/nombre-receta"></div>
+  <div class="field"><label>Nombre de la receta <span class="req">*</span></label><input type="text" id="r_nombre" placeholder="Nombre de la receta"></div>
+  <div class="field"><label>Descripción <span class="opt">opcional</span></label><textarea id="r_desc" placeholder="Descripción breve de la receta..."></textarea></div>
+  <div class="field"><label>URL imagen <span class="rec">recomendado</span></label><input type="text" id="r_img" placeholder="https://tudominio.com/imagen.jpg"><span class="hint">Proporción 16:9, 4:3 o 1:1</span></div>
+  <div class="field"><label>Fecha publicación <span class="opt">opcional</span></label><input type="text" id="r_pub" placeholder="2025-04-15"></div>
+  <div class="section-label">Autor</div>
+  <div class="field-row">
+    <div class="field"><label>Nombre del autor <span class="opt">opcional</span></label><input type="text" id="r_autor" placeholder="Nombre del autor o equipo"></div>
+    <div class="field"><label>Porciones (yield) <span class="rec">recomendado</span></label><input type="text" id="r_yield" placeholder="4 porciones"></div>
+  </div>
+  <div class="section-label">Tiempos</div>
+  <div class="field-row">
+    <div class="field"><label>Preparación <span class="opt">opcional</span></label><input type="text" id="r_prep" placeholder="PT15M"><span class="hint">PT15M = 15 min · PT1H = 1 hora</span></div>
+    <div class="field"><label>Cocción <span class="opt">opcional</span></label><input type="text" id="r_cook" placeholder="PT10M"></div>
+  </div>
+  <div class="field">
+    <label>Categoría de receta <span class="opt">opcional</span></label>
+    <select id="r_cat">
+      <option value="">— seleccionar —</option>
+      <option value="Ensalada">Ensalada</option>
+      <option value="Sopa">Sopa</option>
+      <option value="Plato principal">Plato principal</option>
+      <option value="Acompañamiento">Acompañamiento</option>
+      <option value="Desayuno">Desayuno</option>
+      <option value="Postre">Postre</option>
+      <option value="Snack">Snack</option>
+      <option value="Bebida">Bebida</option>
+    </select>
+  </div>
+  <div class="field"><label>Cocina / Cuisine <span class="opt">opcional</span></label><input type="text" id="r_cuisine" placeholder="Colombiana"></div>
+  <div class="section-label">Ingredientes <span class="rec">recomendado</span></div>
+  <div class="field"><label>Ingredientes (uno por línea)</label><textarea id="r_ingr" style="min-height:80px" placeholder="Ingrediente 1&#10;Ingrediente 2&#10;Ingrediente 3"></textarea></div>
+  <div class="section-label">Instrucciones <span class="rec">recomendado</span></div>
+  <div class="field"><label>Pasos (uno por línea)</label><textarea id="r_steps" style="min-height:80px" placeholder="Escurrir y lavar la arveja.&#10;Picar los tomates y la cebolla en cubos.&#10;Mezclar todos los ingredientes en un bowl."></textarea></div>
+  <div class="section-label">Nutrición y valoración <span class="opt">opcional</span></div>
+  <div class="field-row">
+    <div class="field"><label>Calorías por porción <span class="opt">opcional</span></label><input type="text" id="r_cal" placeholder="180 calories"></div>
+    <div class="field"><label>Puntuación media <span class="opt">opcional</span></label><input type="text" id="r_rating" placeholder="4.7"></div>
+  </div>
+  <div class="field"><label>Número de reseñas <span class="opt">opcional</span></label><input type="text" id="r_reviews" placeholder="32"></div>
+  <button class="btn-gen" onclick="genRecipe()">⟨/⟩ Generar Schema Receta</button>
+</div>
+
+<!-- ════════════════ ORGANIZATION ════════════════ -->
+<div class="form-panel" id="form-org">
+  <div class="info-box"><strong>Organization</strong> — Schema fundamental para que Google entienda tu empresa. Ayuda a aparecer en el Knowledge Panel. Recomendado en todas las páginas principales del sitio.</div>
+  <div class="section-label">Datos básicos</div>
+  <div class="field"><label>Nombre de la organización <span class="req">*</span></label><input type="text" id="o_nombre" placeholder="Mi Empresa S.A.S."></div>
+  <div class="field"><label>URL del sitio <span class="req">*</span></label><input type="text" id="o_url" placeholder="https://tudominio.com"></div>
+  <div class="field"><label>URL del logo <span class="rec">recomendado</span></label><input type="text" id="o_logo" placeholder="https://tudominio.com/logo.png"><span class="hint">PNG o SVG · Fondo transparente o blanco · Min. 112×112px</span></div>
+  <div class="field"><label>Descripción <span class="opt">opcional</span></label><textarea id="o_desc" placeholder="Empresa dedicada a..."></textarea></div>
+  <div class="field-row">
+    <div class="field"><label>Tipo de organización <span class="opt">opcional</span></label>
+      <select id="o_tipo">
+        <option value="Organization">Organization (general)</option>
+        <option value="Corporation">Corporation</option>
+        <option value="LocalBusiness">LocalBusiness</option>
+        <option value="NGO">NGO</option>
+        <option value="EducationalOrganization">EducationalOrganization</option>
+        <option value="GovernmentOrganization">GovernmentOrganization</option>
+        <option value="MedicalOrganization">MedicalOrganization</option>
+      </select>
+    </div>
+    <div class="field"><label>Año de fundación <span class="opt">opcional</span></label><input type="text" id="o_founding" placeholder="2010"></div>
+  </div>
+
+  <div class="section-label">Contacto</div>
+  <div class="field-row">
+    <div class="field"><label>Teléfono <span class="opt">opcional</span></label><input type="text" id="o_tel" placeholder="+57-1-800-000-0000"></div>
+    <div class="field"><label>Email <span class="opt">opcional</span></label><input type="text" id="o_email" placeholder="info@tudominio.com"></div>
+  </div>
+  <div class="field">
+    <label>Tipo de contacto <span class="opt">opcional</span></label>
+    <select id="o_contact_type">
+      <option value="">— seleccionar —</option>
+      <option value="customer service">Atención al cliente</option>
+      <option value="technical support">Soporte técnico</option>
+      <option value="billing support">Facturación</option>
+      <option value="bill payment">Pago de facturas</option>
+      <option value="sales">Ventas</option>
+      <option value="reservations">Reservaciones</option>
+    </select>
+  </div>
+
+  <div class="section-label">Dirección <span class="opt">opcional</span></div>
+  <div class="field"><label>Calle y número <span class="opt">opcional</span></label><input type="text" id="o_calle" placeholder="Calle 100 # 15-23 Oficina 501"></div>
+  <div class="field-row">
+    <div class="field"><label>Ciudad <span class="opt">opcional</span></label><input type="text" id="o_ciudad" placeholder="Bogotá"></div>
+    <div class="field"><label>Departamento / Estado <span class="opt">opcional</span></label><input type="text" id="o_estado" placeholder="Cundinamarca"></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><label>Código postal <span class="opt">opcional</span></label><input type="text" id="o_cp" placeholder="110111"></div>
+    <div class="field"><label>País (código ISO) <span class="opt">opcional</span></label><input type="text" id="o_pais" placeholder="CO"></div>
+  </div>
+
+  <div class="section-label">Redes sociales <span class="opt">sameAs</span></div>
+  <div class="social-grid">
+    <div class="social-row"><div class="social-icon si-x">𝕏</div><input type="text" id="o_twitter" placeholder="https://x.com/TuMarca" style="flex:1"></div>
+    <div class="social-row"><div class="social-icon si-fb">f</div><input type="text" id="o_facebook" placeholder="https://facebook.com/TuMarca" style="flex:1"></div>
+    <div class="social-row"><div class="social-icon si-ig">☀</div><input type="text" id="o_instagram" placeholder="https://instagram.com/tumarca" style="flex:1"></div>
+    <div class="social-row"><div class="social-icon si-li">in</div><input type="text" id="o_linkedin" placeholder="https://linkedin.com/company/tumarca" style="flex:1"></div>
+    <div class="social-row"><div class="social-icon si-yt">▶</div><input type="text" id="o_youtube" placeholder="https://youtube.com/@TuMarca" style="flex:1"></div>
+    <div class="social-row"><div class="social-icon si-wp">W</div><input type="text" id="o_wikipedia" placeholder="https://es.wikipedia.org/wiki/TuMarca" style="flex:1"></div>
+  </div>
+  <button class="btn-gen" onclick="genOrg()" style="margin-top:16px">⟨/⟩ Generar Schema Organization</button>
+</div>
+
+<!-- ════════════════ BREADCRUMB STANDALONE ════════════════ -->
+<div class="form-panel" id="form-breadcrumb">
+  <div class="info-box"><strong>BreadcrumbList</strong> — Define la ruta de navegación de una página. Google la muestra en los resultados de búsqueda. Agrega al menos 2 niveles (Inicio → Página actual).</div>
+  <div class="section-label">Items de navegación</div>
+  <div class="item-list" id="bc-items-list"></div>
+  <button class="btn-add" onclick="addBcItem()">+ Agregar nivel de navegación</button>
+  <button class="btn-gen" onclick="genBreadcrumb()" style="margin-top:14px">⟨/⟩ Generar Schema BreadcrumbList</button>
+</div>
+
+<!-- ════════════════ FAQ ════════════════ -->
+<div class="form-panel" id="form-faq">
+  <div class="info-box"><strong>FAQPage</strong> — Muestra preguntas y respuestas directamente en los resultados de Google (rich results). Cada respuesta debe ser la versión completa del texto visible en la página.</div>
+  <div class="warn-box">Las preguntas y respuestas <strong>deben estar visibles en el HTML de la página</strong>. Google penaliza contenido oculto o diferente al del schema.</div>
+  <div class="section-label">URL de la página <span class="req">*</span></div>
+  <div class="field"><input type="text" id="faq_url" placeholder="https://tudominio.com/preguntas-frecuentes"></div>
+  <div class="section-label">Preguntas y respuestas</div>
+  <div class="item-list" id="faq-items-list"></div>
+  <button class="btn-add" onclick="addFaqItem()">+ Agregar pregunta</button>
+  <button class="btn-gen" onclick="genFaq()" style="margin-top:14px">⟨/⟩ Generar Schema FAQPage</button>
+</div>
+
+<!-- ════════════════ REVIEW ════════════════ -->
+<div class="form-panel" id="form-review">
+  <div class="info-box"><strong>Review Snippet</strong> — Permite mostrar estrellas de calificación en los resultados de Google. Según Google Search Central, los snippets de reseña aplican a libros, películas, productos y negocios locales.</div>
+  <div class="warn-box">Solo para reseñas editoriales (una persona reseña un ítem). Para valoraciones de usuarios, usa <code>aggregateRating</code> en el schema del producto.</div>
+  <div class="section-label">Elemento reseñado</div>
+  <div class="field"><label>Tipo de elemento <span class="req">*</span></label>
+    <select id="rv_item_type">
+      <option value="Product">Producto</option>
+      <option value="Book">Libro</option>
+      <option value="Movie">Película</option>
+      <option value="MusicRecording">Canción / Álbum</option>
+      <option value="LocalBusiness">Negocio local</option>
+      <option value="Restaurant">Restaurante</option>
+      <option value="SoftwareApplication">Aplicación / Software</option>
+      <option value="Course">Curso</option>
+      <option value="Event">Evento</option>
+    </select>
+  </div>
+  <div class="field"><label>Nombre del elemento reseñado <span class="req">*</span></label><input type="text" id="rv_item_name" placeholder="Nombre del producto, libro, lugar..."></div>
+  <div class="field"><label>URL del elemento reseñado <span class="opt">opcional</span></label><input type="text" id="rv_item_url" placeholder="https://tudominio.com/producto"></div>
+  <div class="field"><label>Imagen del elemento <span class="opt">opcional</span></label><input type="text" id="rv_item_img" placeholder="https://tudominio.com/imagen.jpg"></div>
+
+  <div class="section-label">Datos de la reseña</div>
+  <div class="field"><label>URL de la reseña <span class="req">*</span></label><input type="text" id="rv_url" placeholder="https://tudominio.com/resenas/producto"></div>
+  <div class="field"><label>Cuerpo de la reseña <span class="rec">recomendado</span></label><textarea id="rv_body" placeholder="Texto completo de la reseña tal como aparece en la página..."></textarea></div>
+  <div class="field"><label>Fecha de publicación <span class="rec">recomendado</span></label><input type="text" id="rv_date" placeholder="2025-04-15"></div>
+
+  <div class="section-label">Calificación</div>
+  <div class="field-row">
+    <div class="field"><label>Puntuación dada <span class="req">*</span></label><input type="text" id="rv_rating" placeholder="4"></div>
+    <div class="field"><label>Escala máxima <span class="req">*</span></label><input type="text" id="rv_best" placeholder="5"></div>
+  </div>
+  <div class="field"><label>Escala mínima <span class="opt">opcional</span></label><input type="text" id="rv_worst" placeholder="1"></div>
+
+  <div class="section-label">Autor de la reseña</div>
+  <div class="field-row">
+    <div class="field"><label>Nombre del autor <span class="req">*</span></label><input type="text" id="rv_author" placeholder="Nombre del reseñador"></div>
+    <div class="field">
+      <label>Tipo de autor</label>
+      <select id="rv_author_type">
+        <option value="Person">Persona</option>
+        <option value="Organization">Organización / Medio</option>
+      </select>
+    </div>
+  </div>
+  <div class="field"><label>URL del autor <span class="opt">opcional</span></label><input type="text" id="rv_author_url" placeholder="https://tudominio.com/autor/nombre"></div>
+
+  <div class="section-label">Publisher <span class="opt">opcional</span></div>
+  <div class="field-row">
+    <div class="field"><label>Nombre del medio / sitio <span class="opt">opcional</span></label><input type="text" id="rv_pub" placeholder="Nombre del sitio que publica"></div>
+    <div class="field"><label>URL del publisher <span class="opt">opcional</span></label><input type="text" id="rv_pub_url" placeholder="https://tudominio.com"></div>
+  </div>
+  <button class="btn-gen" onclick="genReview()">⟨/⟩ Generar Schema Review</button>
+</div>
+
+</div><!-- /panel-left -->
+
+<!-- ════════════════ RIGHT PANEL ════════════════ -->
+<div class="panel panel-right">
+  <div class="out-header">
+    <span class="out-title">Schema generado · JSON-LD</span>
+    <div class="out-actions">
+      <a class="validate-btn" href="https://search.google.com/test/rich-results" target="_blank" title="Validar en Google Rich Results Test">↗ Validar</a>
+      <button class="copy-btn" id="copy-btn" onclick="copiar()">Copiar</button>
+    </div>
+  </div>
+  <div id="output-area"><div class="placeholder">Selecciona un tipo de schema,<br>completa el formulario y presiona<br><strong style="color:#555">Generar Schema</strong><br><br><span style="font-size:11px;color:#333">💡 Usa el <strong style="color:#8b5cf6">Asesor IA</strong> (barra morada) para saber qué<br>schemas son apropiados para tu URL</span></div></div>
+  <div id="checklist-area"></div>
+</div>
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIG & API KEY
+// ══════════════════════════════════════════════
+const AI_MODEL = 'gpt-4o-mini';
+const AI_API   = 'https://api.openai.com/v1/chat/completions';
+
+function getApiKey() { return localStorage.getItem('sgp_api_key') || ''; }
+function setApiKey(k) { localStorage.setItem('sgp_api_key', k.trim()); }
+
+function showApiModal() {
+  document.getElementById('api-modal').style.display = 'flex';
+  const k = getApiKey();
+  document.getElementById('modal-api-input').value = k;
+  document.getElementById('modal-key-status').innerHTML = k
+    ? '<div class="key-indicator"><span class="key-dot key-set"></span><span style="font-size:10.5px;color:#1a7a4a">Clave configurada ✓</span></div>'
+    : '<div class="key-indicator"><span class="key-dot key-unset"></span><span style="font-size:10.5px;color:#c8102e">Sin clave configurada</span></div>';
+}
+
+function closeApiModal() { document.getElementById('api-modal').style.display = 'none'; }
+
+function saveApiKey() {
+  const v = document.getElementById('modal-api-input').value.trim();
+  if (!v) { showToast('⚠ Ingresa una clave válida'); return; }
+  setApiKey(v);
+  closeApiModal();
+  updateKeyIndicator();
+  showToast('✓ Clave guardada');
+}
+
+function updateKeyIndicator() {
+  const k = getApiKey();
+  const el = document.getElementById('hdr-key-indicator');
+  if (k) {
+    el.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#7ec87e;display:inline-block"></span> IA activa';
+  } else {
+    el.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#f07070;display:inline-block"></span> Sin API key';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  CLAUDE API CALL
+// ══════════════════════════════════════════════
+async function callClaude(prompt, maxTokens = 800) {
+  const key = getApiKey();
+  if (!key) {
+    showApiModal();
+    throw new Error('NO_KEY');
+  }
+  const res = await fetch(AI_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + key
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg = err.error?.message || `Error API ${res.status}`;
+    if (res.status === 401) throw new Error('API key inválida o sin permisos. Verifica tu clave en ⚙ API · IA');
+    if (res.status === 429) throw new Error('Límite de uso alcanzado. Espera un momento e intenta de nuevo');
+    if (res.status === 400) throw new Error('Solicitud inválida: ' + msg);
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+function parseJSON(text) {
+  const clean = text.replace(/```json\n?|```\n?/g, '').trim();
+  return JSON.parse(clean);
+}
+
+// ══════════════════════════════════════════════
+//  AI: AUTOFILL SITE
+// ══════════════════════════════════════════════
+async function autoFillSite() {
+  const urlVal = trim(document.getElementById('g_url').value) || trim(document.getElementById('ai-advisor-url').value);
+  if (!urlVal) { showToast('⚠ Primero ingresa una URL en el campo "URL base del sitio"'); return; }
+  const btn = document.getElementById('btn-autofill');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:11px;height:11px;border-width:2px"></span> Analizando...';
+  try {
+    const text = await callClaude(`Analiza esta URL de un sitio web y extrae la información del sitio.
+URL: ${urlVal}
+
+Basándote únicamente en el dominio/subdominio, infiere:
+1. Nombre de la marca o sitio (humanizado, ej: "ejemplo.com" → "Ejemplo")
+2. URL base exacta (solo protocolo + dominio, sin path ni query)
+3. URL probable del logo (intenta inferir rutas comunes como /logo.png, /assets/logo.svg, o deja vacío si no estás seguro)
+
+Responde ÚNICAMENTE con este JSON válido (sin markdown, sin comentarios):
+{"nombre":"","urlBase":"","logo":"","confianza":"alta|media|baja"}`);
+    const d = parseJSON(text);
+    if (d.nombre) document.getElementById('g_nombre').value = d.nombre;
+    if (d.urlBase) document.getElementById('g_url').value = d.urlBase;
+    if (d.logo)   document.getElementById('g_logo').value = d.logo;
+    syncSite();
+    showToast(`✓ Autocompletado: "${d.nombre}" · Confianza: ${d.confianza || 'media'}`);
+  } catch(e) {
+    if (e.message !== 'NO_KEY') showToast('✕ Error IA: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Autocompletar IA';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  AI: SCHEMA ADVISOR
+// ══════════════════════════════════════════════
+async function runAdvisor() {
+  const url = trim(document.getElementById('ai-advisor-url').value);
+  if (!url) { showToast('⚠ Ingresa una URL para analizar'); return; }
+  const btn = document.getElementById('btn-advisor');
+  const area = document.getElementById('ai-results-area');
+  btn.disabled = true;
+  area.innerHTML = '<div class="ai-loading"><span class="spinner"></span>Analizando URL y determinando schemas óptimos...</div>';
+  try {
+    const text = await callClaude(`Eres un experto en SEO técnico y datos estructurados según Google Search Central.
+
+Analiza esta URL y recomienda qué schemas de Schema.org implementar para maximizar los rich results en Google.
+URL: ${url}
+
+Schemas disponibles en esta herramienta:
+- pdp: PDP Informativa (Thing + ItemPage) → productos sin precio ni carrito
+- ecom: Producto Ecommerce (Product + Offer) → tiendas online
+- article: Artículo / Blog (Article, NewsArticle, BlogPosting)
+- recipe: Receta (Recipe)
+- org: Organization → página de empresa, homepage
+- breadcrumb: BreadcrumbList → rutas de navegación (aplica a casi todas las páginas)
+- faq: FAQPage → páginas de preguntas frecuentes
+- review: Review Snippet → páginas de reseñas editoriales
+
+Analiza el tipo de página, sector probable e intención del usuario. Considera los rich results de Google disponibles.
+
+Responde ÚNICAMENTE con este JSON válido (sin markdown):
+{"tipo":"descripción del tipo de página","recomendaciones":[{"tab":"id","schema":"nombre","prioridad":"alta|media|baja","razon":"explicación breve max 60 chars"}],"notas":"observación opcional"}`, 600);
+    const d = parseJSON(text);
+    let html = '';
+    if (d.tipo) html += `<div style="font-size:10.5px;color:var(--ai);font-weight:600;margin-bottom:5px">📋 Tipo de página: ${d.tipo}</div>`;
+    if (d.recomendaciones?.length) {
+      d.recomendaciones.forEach(r => {
+        html += `<div class="ai-rec-card" onclick="setMode('${r.tab}'); document.getElementById('g_url').value = document.getElementById('g_url').value || '${url}'; syncSite();">
+          <span class="ai-rec-pri pri-${r.prioridad}">${r.prioridad}</span>
+          <div>
+            <div class="ai-rec-name">${r.schema}</div>
+            <div class="ai-rec-reason">${r.razon || ''}</div>
+          </div>
+          <span class="ai-rec-go">→ Ir</span>
+        </div>`;
+      });
+    }
+    if (d.notas) html += `<div style="font-size:10px;color:var(--ink3);margin-top:4px;padding:0 2px">${d.notas}</div>`;
+    area.innerHTML = `<div class="ai-results">${html}</div>`;
+  } catch(e) {
+    if (e.message !== 'NO_KEY') {
+      area.innerHTML = `<div class="ai-error">✕ ${e.message}</div>`;
+    } else {
+      area.innerHTML = '';
+    }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  SITE HELPERS
+// ══════════════════════════════════════════════
+function getSite() {
+  const nombre  = trim(document.getElementById('g_nombre').value) || 'Mi Sitio';
+  const urlBase = trim(document.getElementById('g_url').value).replace(/\/$/,'') || 'https://tudominio.com';
+  const logo    = trim(document.getElementById('g_logo').value);
+  return { nombre, urlBase, logo };
+}
+
+function syncSite() {
+  const marca = document.getElementById('e_marca');
+  if (marca && !marca._touched) {
+    const n = trim(document.getElementById('g_nombre').value);
+    if (n) marca.placeholder = n;
+  }
+  // sync org form
+  const on = document.getElementById('o_nombre');
+  const ou = document.getElementById('o_url');
+  if (on && !on.value) { const n = trim(document.getElementById('g_nombre').value); if(n) on.placeholder = n; }
+  if (ou && !ou.value) { const u = trim(document.getElementById('g_url').value); if(u) ou.placeholder = u; }
+}
+
+// ══════════════════════════════════════════════
+//  MODE SWITCHING
+// ══════════════════════════════════════════════
+const MODES = ['pdp','ecom','article','recipe','org','breadcrumb','faq','review'];
+function setMode(m) {
+  MODES.forEach(k => {
+    document.getElementById('tab-'+k).classList.toggle('active', k===m);
+    document.getElementById('form-'+k).classList.toggle('active', k===m);
+  });
+  document.getElementById('output-area').innerHTML = '<div class="placeholder">Completa el formulario y presiona<br><strong style="color:#555">Generar Schema</strong></div>';
+  document.getElementById('checklist-area').innerHTML = '';
+  window._schemaWrapped = null;
+  // FIX #1: colapsar resultados del asesor y hacer scroll al formulario
+  document.getElementById('ai-results-area').innerHTML = '';
+  document.getElementById('left-panel').scrollTop = 0;
+  document.getElementById('left-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleEcomSubtype() {
+  const v = document.getElementById('e_subtipo').value;
+  document.getElementById('merchant-fields').style.display = v==='merchant' ? 'block' : 'none';
+}
+
+// ══════════════════════════════════════════════
+//  DYNAMIC BUILDERS: BREADCRUMB
+// ══════════════════════════════════════════════
+let bcCounter = 0;
+function addBcItem(name='', url='') {
+  bcCounter++;
+  const pos = document.querySelectorAll('#bc-items-list .item-block').length + 1;
+  const id  = 'bc_' + bcCounter;
+  const isFirst = pos === 1;
+  const div = document.createElement('div');
+  div.className = 'item-block';
+  div.id = 'bc-block-' + id;
+  div.innerHTML = `
+    <div class="item-block-header">
+      <span class="item-num">Nivel ${pos}</span>
+      ${!isFirst ? `<button class="btn-remove" onclick="removeBcItem('bc-block-${id}')" title="Eliminar">✕</button>` : ''}
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Nombre del nivel</label><input type="text" id="${id}_name" value="${name}" placeholder="${pos===1?'Inicio':'Categoría / Página'}"></div>
+      <div class="field"><label>URL del nivel</label><input type="text" id="${id}_url" value="${url}" placeholder="${pos===1?'https://tudominio.com/':'https://tudominio.com/seccion/'}"></div>
+    </div>`;
+  document.getElementById('bc-items-list').appendChild(div);
+  renumberBcItems();
+}
+
+function removeBcItem(blockId) {
+  document.getElementById(blockId).remove();
+  renumberBcItems();
+}
+
+function renumberBcItems() {
+  document.querySelectorAll('#bc-items-list .item-num').forEach((el, i) => { el.textContent = 'Nivel ' + (i+1); });
+}
+
+function getBcItems() {
+  return [...document.querySelectorAll('#bc-items-list .item-block')].map((block, i) => {
+    const inputs = block.querySelectorAll('input[type=text]');
+    return { pos: i+1, name: trim(inputs[0].value), item: trim(inputs[1].value) };
+  });
+}
+
+// ══════════════════════════════════════════════
+//  DYNAMIC BUILDERS: FAQ
+// ══════════════════════════════════════════════
+let faqCounter = 0;
+function addFaqItem(q='', a='') {
+  faqCounter++;
+  const id = 'faq_' + faqCounter;
+  const num = document.querySelectorAll('#faq-items-list .item-block').length + 1;
+  const div = document.createElement('div');
+  div.className = 'item-block';
+  div.id = 'faq-block-' + id;
+  div.innerHTML = `
+    <div class="item-block-header">
+      <span class="item-num">Pregunta ${num}</span>
+      <button class="btn-remove" onclick="removeFaqItem('faq-block-${id}')" title="Eliminar">✕</button>
+    </div>
+    <div class="field"><label>Pregunta</label><input type="text" id="${id}_q" value="${q.replace(/"/g,'&quot;')}" placeholder="¿Cuál es el plazo de entrega?"></div>
+    <div class="field"><label>Respuesta</label><textarea id="${id}_a" style="min-height:60px" placeholder="El plazo de entrega es de 3 a 5 días hábiles...">${a}</textarea></div>`;
+  document.getElementById('faq-items-list').appendChild(div);
+  renumberFaqItems();
+}
+
+function removeFaqItem(blockId) {
+  document.getElementById(blockId).remove();
+  renumberFaqItems();
+}
+
+function renumberFaqItems() {
+  document.querySelectorAll('#faq-items-list .item-num').forEach((el, i) => { el.textContent = 'Pregunta ' + (i+1); });
+}
+
+function getFaqItems() {
+  return [...document.querySelectorAll('#faq-items-list .item-block')].map(block => {
+    const q = trim(block.querySelector('input[type=text]').value);
+    const a = trim(block.querySelector('textarea').value);
+    return { q, a };
+  }).filter(i => i.q && i.a);
+}
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+const trim = v => (v||'').trim();
+const getSellos = id => [...document.querySelectorAll('#'+id+' input:checked')].map(i=>i.value);
+
+function buildBreadcrumb(urlBase, pageUrl, lastName) {
+  let path;
+  try { path = new URL(pageUrl).pathname.replace(/\/$/,''); } catch(e) { path='/productos/producto'; }
+  const parts = path.split('/').filter(Boolean);
+  const labels = {productos:'Productos',enlatados:'Enlatados',salsas:'Salsas',mermeladas:'Mermeladas',condimentos:'Condimentos',recetas:'Recetas',blog:'Blog',noticias:'Noticias',preguntas:'Preguntas Frecuentes',faq:'FAQ',tienda:'Tienda',categorias:'Categorías'};
+  const items = [{pos:1,name:'Inicio',item:urlBase+'/'}];
+  let cum = urlBase;
+  for (let i=0;i<parts.length-1;i++){
+    cum += '/'+parts[i];
+    items.push({pos:i+2,name:labels[parts[i]]||cap(parts[i]),item:cum+'/'});
+  }
+  items.push({pos:items.length+1,name:lastName,item:pageUrl});
+  return items;
+}
+
+function cap(s) { return s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
+
+function buildGraphBase(site, pageUrl, nombre) {
+  const baseId = pageUrl.replace(/\/$/,'');
+  const orgId  = site.urlBase+'/#organization';
+  const wsId   = site.urlBase+'/#website';
+  return {
+    org: { "@type":"Organization","@id":orgId,"name":site.nombre,"url":site.urlBase+'/',
+      ...(site.logo ? {"logo":{"@type":"ImageObject","url":site.logo}} : {}) },
+    website: { "@type":"WebSite","@id":wsId,"url":site.urlBase+'/','name':site.nombre,"publisher":{"@id":orgId} },
+    breadcrumb: (bcItems) => ({
+      "@type":"BreadcrumbList","@id":baseId+"#breadcrumb",
+      "itemListElement":bcItems.map(b=>({ "@type":"ListItem","position":b.pos,"name":b.name,"item":b.item }))
+    }),
+    webpage: (desc,img,entityId,bcId) => ({
+      "@type":"ItemPage","@id":baseId+"#webpage","url":pageUrl,"name":nombre,
+      "isPartOf":{"@id":wsId},"breadcrumb":{"@id":bcId},
+      ...(img ? {"primaryImageOfPage":{"@type":"ImageObject","url":img}} : {}),
+      "mainEntity":{"@id":entityId},
+      ...(desc ? {"description":desc} : {})
+    }),
+    baseId, orgId, wsId
+  };
+}
+
+// ══════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════
+function renderOutput(schema, checks, note) {
+  const json = JSON.stringify(schema,null,2);
+  const wrapped = '<script type="application/ld+json">\n'+json+'\n<\/script>';
+  window._schemaWrapped = wrapped;
+  document.getElementById('output-area').innerHTML = '<div class="code-out">'+highlight(json)+'</div>';
+  document.getElementById('checklist-area').innerHTML = `
+    <div class="checklist">${checks.map(c=>`<div class="ci ${c.ok?'ok':c.warn?'warn':'fail'}"><span class="dot"></span>${c.label}</div>`).join('')}</div>
+    ${note ? '<div class="success-note">'+note+'</div>' : ''}`;
+}
+
+function renderError(errs) {
+  document.getElementById('output-area').innerHTML =
+    `<div style="background:#1a0a0e;border:1px solid #5a1a22;border-radius:8px;padding:14px;color:#f07070;font-size:12px;font-family:var(--mono);line-height:1.8"><strong style="color:#e05050">✕ Campos requeridos vacíos:</strong><br>${errs.map(e=>'· '+e).join('<br>')}</div>`;
+  document.getElementById('checklist-area').innerHTML = '';
+}
+
+function highlight(str) {
+  return str
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"(@type|@id|@context|@graph)"(\s*:)/g,'<span class="sk">"$1"</span>$2')
+    .replace(/"(https?:\/\/[^"]+)"/g,'<span class="su">"$1"</span>')
+    .replace(/"([^"]+)"(\s*:)/g,'<span class="sk">"$1"</span>$2')
+    .replace(/:\s*"([^"]*?)"/g,(m,v)=>v.startsWith('http')?m:': <span class="ss">"'+v+'"</span>')
+    .replace(/:\s*(\d[\d.]*)/g,': <span class="sn">$1</span>')
+    .replace(/([{}[\]])/g,'<span class="sb">$1</span>');
+}
+
+function copiar() {
+  if (!window._schemaWrapped) return;
+  navigator.clipboard.writeText(window._schemaWrapped).then(() => {
+    const b = document.getElementById('copy-btn');
+    b.textContent='✓ Copiado'; b.classList.add('copied');
+    setTimeout(()=>{b.textContent='Copiar';b.classList.remove('copied');},2000);
+  });
+}
+
+function showToast(msg, dur=2500) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), dur);
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: PDP INFORMATIVA
+// ══════════════════════════════════════════════
+function genPDP() {
+  const site = getSite();
+  const url=trim(document.getElementById('p_url').value);
+  const sku=trim(document.getElementById('p_sku').value);
+  const ean=trim(document.getElementById('p_ean').value);
+  const nombre=trim(document.getElementById('p_nombre').value);
+  const desc=trim(document.getElementById('p_desc').value);
+  const img=trim(document.getElementById('p_img').value);
+  const tam=trim(document.getElementById('p_tam').value);
+  const pre=trim(document.getElementById('p_pre').value);
+  const cat=trim(document.getElementById('p_cat').value);
+  const vida=trim(document.getElementById('p_vida').value);
+  const caract=trim(document.getElementById('p_caract').value);
+  const sellos=getSellos('p-sellos');
+  const marca=trim(document.getElementById('p_marca').value)||site.nombre;
+  const errs=[];
+  if(!site.urlBase||site.urlBase==='https://tudominio.com') errs.push('URL base del sitio (barra superior)');
+  if(!site.nombre||site.nombre==='Mi Sitio') errs.push('Nombre del sitio / marca (barra superior)');
+  if(!url) errs.push('URL'); if(!sku) errs.push('SKU'); if(!ean) errs.push('EAN');
+  if(!nombre) errs.push('Nombre del producto'); if(!desc) errs.push('Descripción');
+  if(!img) errs.push('Imagen'); if(!tam) errs.push('Tamaño'); if(!pre) errs.push('Presentación'); if(!cat) errs.push('Categoría');
+  if(errs.length){ renderError(errs); return; }
+  const g = buildGraphBase(site, url, nombre);
+  const bcItems = buildBreadcrumb(site.urlBase, url, nombre);
+  const bcId = g.baseId+'#breadcrumb';
+  const entityId = g.baseId+'#entity';
+  const addProps=[];
+  if(tam) addProps.push({name:'Tamaño',value:tam});
+  if(pre) addProps.push({name:'Presentación',value:pre});
+  if(vida) addProps.push({name:'Vida útil',value:vida});
+  const cv = caract.toLowerCase();
+  if(caract && cv!=='no aplica' && cv!=='no aplica para este') addProps.push({name:'Características',value:caract});
+  sellos.forEach(s=>addProps.push({name:'Sello de advertencia',value:s}));
+  const schema = {
+    "@context":"https://schema.org","@graph":[
+      g.org, g.website, g.breadcrumb(bcItems), g.webpage(desc,img,entityId,bcId),
+      { "@type":"Thing","@id":entityId,"name":nombre,"description":desc,"url":url,
+        "image":{"@type":"ImageObject","url":img},"sku":sku,"gtin13":ean,
+        "brand":{"@type":"Brand","name":marca},"manufacturer":{"@id":g.orgId},"category":cat,
+        ...(addProps.length ? {"additionalProperty":addProps.map(p=>({"@type":"PropertyValue","name":p.name,"value":p.value}))} : {}) }
+    ]
+  };
+  renderOutput(schema,[
+    {ok:true,label:'Tipo Thing · sin error "offers requerido"'},
+    {ok:true,label:'@graph con 5 nodos interconectados'},
+    {ok:bcItems.length>=2,label:'BreadcrumbList con '+bcItems.length+' niveles'},
+    {ok:img.length>30&&!img.includes('…'),label:'URL imagen completa sin truncar'},
+    {ok:ean.replace(/\D/g,'').length===13,label:'GTIN-13 · '+ean.replace(/\D/g,'').length+' dígitos'},
+    {ok:addProps.length>0,label:'additionalProperty · '+addProps.length+' propiedad(es)'},
+  ],'✓ Listo · Pega el &lt;script&gt; en el &lt;head&gt; de tu página');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: ECOMMERCE
+// ══════════════════════════════════════════════
+function genEcom() {
+  const site=getSite();
+  const subtipo=document.getElementById('e_subtipo').value;
+  const url=trim(document.getElementById('e_url').value);
+  const sku=trim(document.getElementById('e_sku').value);
+  const ean=trim(document.getElementById('e_ean').value);
+  const nombre=trim(document.getElementById('e_nombre').value);
+  const desc=trim(document.getElementById('e_desc').value);
+  const img=trim(document.getElementById('e_img').value);
+  const cat=trim(document.getElementById('e_cat').value);
+  const marca=trim(document.getElementById('e_marca').value)||site.nombre;
+  const precio=trim(document.getElementById('e_precio').value);
+  const moneda=document.getElementById('e_moneda').value;
+  const disp=document.getElementById('e_disp').value;
+  const pvigencia=trim(document.getElementById('e_pvigencia').value);
+  const cond=document.getElementById('e_cond').value;
+  const rating=trim(document.getElementById('e_rating').value);
+  const reviews=trim(document.getElementById('e_reviews').value);
+  const errs=[];
+  if(!site.urlBase||site.urlBase==='https://tudominio.com') errs.push('URL base del sitio');
+  if(!url) errs.push('URL'); if(!sku) errs.push('SKU'); if(!nombre) errs.push('Nombre');
+  if(!desc) errs.push('Descripción'); if(!img) errs.push('Imagen'); if(!cat) errs.push('Categoría');
+  if(subtipo==='merchant'&&!precio) errs.push('Precio (requerido para Merchant Listing)');
+  if(errs.length){ renderError(errs); return; }
+  const g=buildGraphBase(site,url,nombre);
+  const bcItems=buildBreadcrumb(site.urlBase,url,nombre);
+  const offer=subtipo==='merchant'?{"@type":"Offer","url":url,"priceCurrency":moneda,"price":parseFloat(precio),"availability":disp,"itemCondition":cond,...(pvigencia?{"priceValidUntil":pvigencia}:{}),"seller":{"@id":g.orgId}}:undefined;
+  const product={"@type":"Product","@id":g.baseId+"#product","name":nombre,"description":desc,"url":url,"image":{"@type":"ImageObject","url":img},...(sku?{"sku":sku}:{}),...(ean?{"gtin13":ean}:{}),"brand":{"@type":"Brand","name":marca},"category":cat,...(offer?{"offers":offer}:{}),...((rating&&reviews)?{"aggregateRating":{"@type":"AggregateRating","ratingValue":parseFloat(rating),"reviewCount":parseInt(reviews),"bestRating":5}}:{})};
+  const schema={"@context":"https://schema.org","@graph":[g.org,g.website,g.breadcrumb(bcItems),{...g.webpage(desc,img,g.baseId+"#product",g.baseId+"#breadcrumb"),"@type":"ItemPage"},product]};
+  const hasTrigger=!!offer||(!!rating&&!!reviews);
+  renderOutput(schema,[
+    {ok:true,label:'Tipo: Product ('+subtipo+')'},
+    {ok:hasTrigger,label:subtipo==='merchant'?'Offer incluido · Merchant Listing ✓':(hasTrigger?'aggregateRating incluido · Product Snippet ✓':'FALTA offers o aggregateRating')},
+    {ok:img.length>30,label:'Imagen presente'},
+    {ok:!!ean,label:ean?'GTIN-13 · '+ean:'EAN no proporcionado'},
+    {ok:!!(rating&&reviews),label:rating&&reviews?'AggregateRating: '+rating+'/5 · '+reviews+' reseñas':'Sin valoraciones (opcional)'},
+  ],'✓ Listo · Valida en search.google.com/test/rich-results');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: ARTICLE
+// ══════════════════════════════════════════════
+function genArticle() {
+  const site=getSite();
+  const tipo=document.getElementById('a_tipo').value;
+  const url=trim(document.getElementById('a_url').value);
+  const headline=trim(document.getElementById('a_headline').value);
+  const desc=trim(document.getElementById('a_desc').value);
+  const img=trim(document.getElementById('a_img').value);
+  const autor=trim(document.getElementById('a_autor').value);
+  const autorTipo=document.getElementById('a_autor_tipo').value;
+  const autorUrl=trim(document.getElementById('a_autor_url').value);
+  const pub=trim(document.getElementById('a_pub').value);
+  const mod=trim(document.getElementById('a_mod').value);
+  const errs=[];
+  if(!site.urlBase||site.urlBase==='https://tudominio.com') errs.push('URL base del sitio');
+  if(!url) errs.push('URL'); if(!headline) errs.push('Titular (headline)');
+  if(errs.length){ renderError(errs); return; }
+  const baseId=url.replace(/\/$/,'');
+  const bcItems=buildBreadcrumb(site.urlBase,url,headline);
+  const authorObj=autor?{"@type":autorTipo,"name":autor,...(autorUrl?{"url":autorUrl}:{}),...(autorTipo==='Organization'?{"@id":site.urlBase+'/#organization'}:{})}:{"@id":site.urlBase+'/#organization'};
+  const schema={"@context":"https://schema.org","@graph":[
+    {"@type":"Organization","@id":site.urlBase+'/#organization',"name":site.nombre,"url":site.urlBase+'/',...(site.logo?{"logo":{"@type":"ImageObject","url":site.logo}}:{})},
+    {"@type":"WebSite","@id":site.urlBase+'/#website',"url":site.urlBase+'/','name':site.nombre,"publisher":{"@id":site.urlBase+'/#organization'}},
+    {"@type":"BreadcrumbList","@id":baseId+"#breadcrumb","itemListElement":bcItems.map(b=>({"@type":"ListItem","position":b.pos,"name":b.name,"item":b.item}))},
+    {"@type":tipo,"@id":baseId+"#article","url":url,"headline":headline,...(desc?{"description":desc}:{}),...(img?{"image":[img]}:{}),...(pub?{"datePublished":pub}:{}),...(mod?{"dateModified":mod}:{}),"author":authorObj,"publisher":{"@id":site.urlBase+'/#organization'},"isPartOf":{"@id":site.urlBase+'/#website'},"breadcrumb":{"@id":baseId+"#breadcrumb"},"mainEntityOfPage":{"@id":baseId+"#webpage"}}
+  ]};
+  renderOutput(schema,[
+    {ok:true,label:'Tipo: '+tipo+' (Google Search Central ✓)'},
+    {ok:headline.length<=110,label:'Headline: '+headline.length+' chars '+(headline.length<=110?'(máx 110 ✓)':'(excede 110 ⚠)')},
+    {ok:!!img,label:img?'Imagen presente':'Sin imagen (recomendada para rich results)'},
+    {ok:!!autor,label:autor?'Autor: '+autor:'Sin autor (recomendado)'},
+    {ok:!!pub,label:pub?'datePublished: '+pub:'Sin fecha publicación (recomendada)'},
+    {ok:!!mod,label:mod?'dateModified incluido ✓':'Sin dateModified (recomendado)'},
+  ],'✓ Listo · Artículo válido según Google Search Central');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: RECIPE
+// ══════════════════════════════════════════════
+function genRecipe() {
+  const site=getSite();
+  const url=trim(document.getElementById('r_url').value);
+  const nombre=trim(document.getElementById('r_nombre').value);
+  const desc=trim(document.getElementById('r_desc').value);
+  const img=trim(document.getElementById('r_img').value);
+  const pub=trim(document.getElementById('r_pub').value);
+  const autor=trim(document.getElementById('r_autor').value);
+  const ryield=trim(document.getElementById('r_yield').value);
+  const prep=trim(document.getElementById('r_prep').value);
+  const cook=trim(document.getElementById('r_cook').value);
+  const cat=document.getElementById('r_cat').value;
+  const cuisine=trim(document.getElementById('r_cuisine').value);
+  const ingrRaw=trim(document.getElementById('r_ingr').value);
+  const stepsRaw=trim(document.getElementById('r_steps').value);
+  const cal=trim(document.getElementById('r_cal').value);
+  const rating=trim(document.getElementById('r_rating').value);
+  const reviews=trim(document.getElementById('r_reviews').value);
+  const errs=[];
+  if(!site.urlBase||site.urlBase==='https://tudominio.com') errs.push('URL base del sitio');
+  if(!url) errs.push('URL'); if(!nombre) errs.push('Nombre de la receta');
+  if(errs.length){ renderError(errs); return; }
+  const baseId=url.replace(/\/$/,'');
+  const bcItems=buildBreadcrumb(site.urlBase,url,nombre);
+  const ingrs=ingrRaw?ingrRaw.split('\n').map(l=>l.trim()).filter(Boolean):[];
+  const steps=stepsRaw?stepsRaw.split('\n').map((l,i)=>({"@type":"HowToStep","position":i+1,"name":"Paso "+(i+1),"text":l.trim()})).filter(s=>s.text):[];
+  const authorNode=autor?{"@type":"Organization","name":autor}:{"@type":"Organization","name":site.nombre,"@id":site.urlBase+'/#organization'};
+  const schema={"@context":"https://schema.org","@graph":[
+    {"@type":"Organization","@id":site.urlBase+'/#organization',"name":site.nombre,"url":site.urlBase+'/',...(site.logo?{"logo":{"@type":"ImageObject","url":site.logo}}:{})},
+    {"@type":"WebSite","@id":site.urlBase+'/#website',"url":site.urlBase+'/','name':site.nombre,"publisher":{"@id":site.urlBase+'/#organization'}},
+    {"@type":"BreadcrumbList","@id":baseId+"#breadcrumb","itemListElement":bcItems.map(b=>({"@type":"ListItem","position":b.pos,"name":b.name,"item":b.item}))},
+    {"@type":"Recipe","@id":baseId+"#recipe","url":url,"name":nombre,...(desc?{"description":desc}:{}),...(img?{"image":[img]}:{}),...(pub?{"datePublished":pub}:{}),"author":authorNode,"publisher":{"@id":site.urlBase+'/#organization'},...(prep?{"prepTime":prep}:{}),...(cook?{"cookTime":cook}:{}),...((prep&&cook)?{"totalTime":combineTimes(prep,cook)}:{}),...(ryield?{"recipeYield":ryield}:{}),...(cat?{"recipeCategory":cat}:{}),...(cuisine?{"recipeCuisine":cuisine}:{}),...(ingrs.length?{"recipeIngredient":ingrs}:{}),...(steps.length?{"recipeInstructions":steps}:{}),...(cal?{"nutrition":{"@type":"NutritionInformation","calories":cal}}:{}),...((rating&&reviews)?{"aggregateRating":{"@type":"AggregateRating","ratingValue":parseFloat(rating),"reviewCount":parseInt(reviews),"bestRating":5}}:{}),"isPartOf":{"@id":site.urlBase+'/#website'},"breadcrumb":{"@id":baseId+"#breadcrumb"}}
+  ]};
+  renderOutput(schema,[
+    {ok:true,label:'Tipo: Recipe (Google Search Central ✓)'},
+    {ok:!!img,label:img?'Imagen presente ✓':'Sin imagen (muy recomendada)'},
+    {ok:ingrs.length>0,label:ingrs.length>0?ingrs.length+' ingredientes ✓':'Sin ingredientes (recomendados)'},
+    {ok:steps.length>0,label:steps.length>0?steps.length+' pasos de instrucción ✓':'Sin instrucciones (recomendadas)'},
+    {ok:!!(prep||cook),label:(prep||cook)?'Tiempos incluidos ✓':'Sin tiempos (recomendados)'},
+    {ok:!!(rating&&reviews),label:rating&&reviews?'AggregateRating: '+rating+'/5 · '+reviews+' reseñas ✓':'Sin valoraciones (opcional)'},
+    {ok:!!ryield,label:ryield?'Porciones: '+ryield+' ✓':'Sin recipeYield (recomendado)'},
+  ],'✓ Listo · Receta válida según Google Search Central');
+}
+
+function combineTimes(a,b) {
+  const mins=t=>{const h=(t.match(/(\d+)H/)||[])[1]||0;const m=(t.match(/(\d+)M/)||[])[1]||0;return parseInt(h)*60+parseInt(m);};
+  const total=mins(a)+mins(b);const h=Math.floor(total/60),m=total%60;
+  return 'PT'+(h?h+'H':'')+(m?m+'M':'');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: ORGANIZATION
+// ══════════════════════════════════════════════
+function genOrg() {
+  const nombre=trim(document.getElementById('o_nombre').value);
+  const url=trim(document.getElementById('o_url').value).replace(/\/$/,'');
+  const logo=trim(document.getElementById('o_logo').value);
+  const desc=trim(document.getElementById('o_desc').value);
+  const tipo=document.getElementById('o_tipo').value;
+  const founding=trim(document.getElementById('o_founding').value);
+  const tel=trim(document.getElementById('o_tel').value);
+  const email=trim(document.getElementById('o_email').value);
+  const contactType=document.getElementById('o_contact_type').value;
+  const calle=trim(document.getElementById('o_calle').value);
+  const ciudad=trim(document.getElementById('o_ciudad').value);
+  const estado=trim(document.getElementById('o_estado').value);
+  const cp=trim(document.getElementById('o_cp').value);
+  const pais=trim(document.getElementById('o_pais').value);
+  const twitter=trim(document.getElementById('o_twitter').value);
+  const facebook=trim(document.getElementById('o_facebook').value);
+  const instagram=trim(document.getElementById('o_instagram').value);
+  const linkedin=trim(document.getElementById('o_linkedin').value);
+  const youtube=trim(document.getElementById('o_youtube').value);
+  const wikipedia=trim(document.getElementById('o_wikipedia').value);
+  const errs=[];
+  if(!nombre) errs.push('Nombre de la organización');
+  if(!url) errs.push('URL del sitio');
+  if(errs.length){ renderError(errs); return; }
+  const sameAs=[twitter,facebook,instagram,linkedin,youtube,wikipedia].filter(Boolean);
+  const hasAddress=calle||ciudad||estado||cp||pais;
+  const hasContact=tel||email;
+  const schema={
+    "@context":"https://schema.org",
+    "@type":tipo,
+    "@id":url+'/#organization',
+    "name":nombre,
+    "url":url+'/',
+    ...(desc?{"description":desc}:{}),
+    ...(logo?{"logo":{"@type":"ImageObject","url":logo,"contentUrl":logo}}:{}),
+    ...(founding?{"foundingDate":founding}:{}),
+    ...(hasAddress?{"address":{"@type":"PostalAddress",...(calle?{"streetAddress":calle}:{}),...(ciudad?{"addressLocality":ciudad}:{}),...(estado?{"addressRegion":estado}:{}),...(cp?{"postalCode":cp}:{}),...(pais?{"addressCountry":pais}:{})}}:{}),
+    ...(hasContact&&contactType?{"contactPoint":{"@type":"ContactPoint","contactType":contactType,...(tel?{"telephone":tel}:{}),...(email?{"email":email}:{}),"availableLanguage":"Spanish"}}:{}),
+    ...(tel&&!contactType?{"telephone":tel}:{}),
+    ...(email&&!contactType?{"email":email}:{}),
+    ...(sameAs.length?{"sameAs":sameAs}:{})
+  };
+  renderOutput(schema,[
+    {ok:true,label:'Tipo: '+tipo},
+    {ok:!!logo,label:logo?'Logo presente ✓':'Sin logo (muy recomendado para Knowledge Panel)'},
+    {ok:!!desc,label:desc?'Descripción incluida ✓':'Sin descripción (recomendada)'},
+    {ok:sameAs.length>0,label:sameAs.length>0?'sameAs: '+sameAs.length+' redes sociales ✓':'Sin sameAs (importante para Knowledge Panel)'},
+    {ok:hasAddress,label:hasAddress?'Dirección física incluida ✓':'Sin dirección (recomendada para LocalBusiness)'},
+    {ok:hasContact,label:hasContact?'Contacto incluido ✓':'Sin datos de contacto'},
+    {ok:!!founding,label:founding?'foundingDate: '+founding+' ✓':'Sin año de fundación (opcional)'},
+  ],'✓ Listo · Organization schema · Válido según Google Search Central');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: BREADCRUMB (STANDALONE)
+// ══════════════════════════════════════════════
+function genBreadcrumb() {
+  const items=getBcItems();
+  if(items.length<2){ renderError(['Agrega al menos 2 niveles de navegación']); return; }
+  const emptyItems=items.filter(i=>!i.name||!i.item);
+  if(emptyItems.length){ renderError(['Todos los niveles deben tener nombre y URL']); return; }
+  const schema={
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":items.map(b=>({"@type":"ListItem","position":b.pos,"name":b.name,"item":b.item}))
+  };
+  renderOutput(schema,[
+    {ok:items.length>=2,label:'BreadcrumbList con '+items.length+' niveles ✓'},
+    {ok:items[0].item.endsWith('/'),label:items[0].item.endsWith('/')?'URL raíz termina en / ✓':'URL raíz debería terminar en /'},
+    {ok:items.every(i=>i.item.startsWith('http')),label:items.every(i=>i.item.startsWith('http'))?'Todas las URLs son absolutas ✓':'Usa URLs absolutas (con https://)'},
+    {ok:true,label:'Posiciones de ListItem correlativas ✓'},
+  ],'✓ Listo · BreadcrumbList · Aplica en páginas de sección y producto');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: FAQ PAGE
+// ══════════════════════════════════════════════
+function genFaq() {
+  const url=trim(document.getElementById('faq_url').value);
+  const items=getFaqItems();
+  const errs=[];
+  if(!url) errs.push('URL de la página FAQ');
+  if(items.length===0) errs.push('Agrega al menos una pregunta y respuesta');
+  if(errs.length){ renderError(errs); return; }
+  const schema={
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "url":url,
+    "mainEntity":items.map(i=>({
+      "@type":"Question",
+      "name":i.q,
+      "acceptedAnswer":{"@type":"Answer","text":i.a}
+    }))
+  };
+  const longAnswers=items.filter(i=>i.a.length>300).length;
+  renderOutput(schema,[
+    {ok:true,label:'Tipo: FAQPage (Google Search Central ✓)'},
+    {ok:items.length>=3,label:items.length+' pregunta(s) '+(items.length>=3?'✓ (mínimo recomendado: 3)':'(recomendado: 3+)')},
+    {ok:items.every(i=>i.a.length>=50),label:items.every(i=>i.a.length>=50)?'Todas las respuestas son suficientemente detalladas ✓':'Algunas respuestas son muy cortas'},
+    {ok:longAnswers===0,warn:longAnswers>0,label:longAnswers>0?longAnswers+' respuesta(s) muy largas: Google muestra máx. 300 chars':'Longitud de respuestas ✓'},
+    {ok:true,label:'Las respuestas deben estar visibles en el HTML de la página'},
+  ],'✓ Listo · FAQPage · Verifica visibilidad en Rich Results Test');
+}
+
+// ══════════════════════════════════════════════
+//  SCHEMA: REVIEW
+// ══════════════════════════════════════════════
+function genReview() {
+  const itemType=document.getElementById('rv_item_type').value;
+  const itemName=trim(document.getElementById('rv_item_name').value);
+  const itemUrl=trim(document.getElementById('rv_item_url').value);
+  const itemImg=trim(document.getElementById('rv_item_img').value);
+  const url=trim(document.getElementById('rv_url').value);
+  const body=trim(document.getElementById('rv_body').value);
+  const date=trim(document.getElementById('rv_date').value);
+  const rating=trim(document.getElementById('rv_rating').value);
+  const best=trim(document.getElementById('rv_best').value)||'5';
+  const worst=trim(document.getElementById('rv_worst').value)||'1';
+  const author=trim(document.getElementById('rv_author').value);
+  const authorType=document.getElementById('rv_author_type').value;
+  const authorUrl=trim(document.getElementById('rv_author_url').value);
+  const pub=trim(document.getElementById('rv_pub').value);
+  const pubUrl=trim(document.getElementById('rv_pub_url').value);
+  const errs=[];
+  if(!itemName) errs.push('Nombre del elemento reseñado');
+  if(!url) errs.push('URL de la reseña');
+  if(!rating) errs.push('Puntuación dada');
+  if(!author) errs.push('Nombre del autor de la reseña');
+  if(errs.length){ renderError(errs); return; }
+  const schema={
+    "@context":"https://schema.org",
+    "@type":"Review",
+    "url":url,
+    ...(date?{"datePublished":date}:{}),
+    "itemReviewed":{
+      "@type":itemType,
+      "name":itemName,
+      ...(itemUrl?{"url":itemUrl}:{}),
+      ...(itemImg?{"image":{"@type":"ImageObject","url":itemImg}}:{})
+    },
+    "reviewRating":{
+      "@type":"Rating",
+      "ratingValue":parseFloat(rating),
+      "bestRating":parseFloat(best),
+      "worstRating":parseFloat(worst)
+    },
+    "author":{
+      "@type":authorType,
+      "name":author,
+      ...(authorUrl?{"url":authorUrl}:{})
+    },
+    ...(body?{"reviewBody":body}:{}),
+    ...(pub?{"publisher":{"@type":"Organization","name":pub,...(pubUrl?{"url":pubUrl}:{})}}:{})
+  };
+  renderOutput(schema,[
+    {ok:true,label:'Tipo: Review con '+itemType+' como itemReviewed'},
+    {ok:parseFloat(rating)>=parseFloat(worst)&&parseFloat(rating)<=parseFloat(best),label:'ratingValue ('+rating+') dentro del rango '+worst+'-'+best+' ✓'},
+    {ok:!!body,label:body?'reviewBody incluido ✓':'Sin reviewBody (muy recomendado)'},
+    {ok:!!date,label:date?'datePublished: '+date+' ✓':'Sin fecha (recomendada)'},
+    {ok:authorType==='Person',warn:authorType==='Organization',label:authorType==='Person'?'Autor: Persona (mejor para rich results)':'Autor: Organización (Google prefiere Person para snippets)'},
+    {ok:!!pub,label:pub?'Publisher: '+pub+' ✓':'Sin publisher (recomendado)'},
+  ],'✓ Listo · Review Snippet · Valida en search.google.com/test/rich-results');
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  toggleEcomSubtype();
+  initSellos('p-sellos');
+  document.getElementById('e_marca').addEventListener('input', function(){ this._touched=true; });
+
+  // Init breadcrumb with 2 default items
+  addBcItem('Inicio','');
+  addBcItem('','');
+
+  // Init FAQ with 2 default questions
+  addFaqItem('','');
+  addFaqItem('','');
+
+  updateKeyIndicator();
+
+  // Close modal on overlay click
+  document.getElementById('api-modal').addEventListener('click', function(e){
+    if(e.target===this) closeApiModal();
+  });
+
+  // Enter key for schema advisor
+  document.getElementById('ai-advisor-url').addEventListener('keydown', e => {
+    if(e.key==='Enter') runAdvisor();
+  });
+});
+
+function initSellos(id) {
+  document.querySelectorAll('#'+id+' input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      this.closest('.sello-item').classList.toggle('active', this.checked);
+    });
+  });
+}
+</script>
+</body>
+</html>
